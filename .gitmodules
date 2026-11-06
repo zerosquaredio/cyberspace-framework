@@ -1,0 +1,7 @@
+[submodule "nexus-lounge"]
+	path = nexus-lounge
+	url = https://github.com/zerosquaredio/nexus-lounge.git
+[submodule "enigma-bbs"]
+	path = enigma-bbs
+	url = https://github.com/zerosquaredio/enigma-bbs.git
+	branch = atproto-login
