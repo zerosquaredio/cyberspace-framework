@@ -214,6 +214,68 @@ and leaves keep identity behind an interface so a better mechanism (passkeys,
 another federated identity) can be added alongside. On the BBS this already
 exists as login types (`users.allowedAuthFactor1Types`).
 
+### 6.3 Joining: leaves and their existing users
+
+*Decided 2026-11-06.* A leaf joining a hub does **not** require its users to
+have AT accounts. Two things are separate:
+
+- **The leaf joining** is its admin's job, done once: create the leaf's AT
+  account (§6.1), optionally turn on AT login, and make an agreement with a
+  hub (§4.1). The leaf then appears in the directory and its traffic can go
+  through the hub's tunnel.
+- **A user taking part in the hub's shared features** (presence, the common
+  space, avatars, the game lobby) needs a hub-level identity.
+
+Existing users lose nothing. A password user can still find the leaf in the
+directory, connect through the hub's tunnel, and log in with their old
+username and password; the hub routes the session without knowing who they
+are.
+
+Levels of participation:
+
+| User | Can |
+|---|---|
+| **No account anywhere** (visitor) | Browse the directory, connect to leaves, apply on leaves that take new users |
+| **Leaf account only** | Everything they could before, through the hub |
+| **Leaf account, vouched for by the leaf** (§6.4) | Appear in the common space as `alice@coolbbs`, chat, join lobbies, as that leaf's user only |
+| **AT account** | Full hub membership: one identity across all leaves, avatars from their own repo, presence, everything across leaves |
+
+There is **no separate hub registration**: logging in to the hub with AT is
+the hub account. The hub keeps a small profile keyed by DID, created at
+first login, and stores no passwords.
+
+**Linking an existing leaf account to AT** works from both directions, and
+needs proof of both sides (the leaf password and the AT approval):
+
+1. **From the leaf:** the user logs in with their password, chooses "link
+   Bluesky account" in their settings, and approves in the browser. The
+   leaf records the DID on their existing account; either login works after
+   that.
+2. **After AT login:** when a leaf finds no user for the DID, it offers "I
+   already have an account here" (username and password, once) before the
+   new user application.
+
+The link is stored on the leaf, privately (§7.2's rule), not published.
+
+**Lowering the barrier to an AT account:** a hub may run a PDS (already
+planned for leaf accounts) that also creates *user* accounts, with handles
+like `alice.hub.example`. "Sign up at the hub" then means getting a real,
+portable AT account in one step.
+
+### 6.4 Leaf-vouched identities
+
+For users who don't want an AT account, the leaf vouches for them: it gives
+the hub a short-lived statement ("this session is user 42, `alice`, on
+coolbbs") signed with the leaf DID's key. The hub shows them as
+`alice@coolbbs`.
+
+- The hub trusts the leaf's word, and only for that leaf's users; a leaf
+  can't vouch for anyone as belonging elsewhere.
+- The identity doesn't carry to other leaves, and it has no AT repo, so
+  avatars come from the leaf or the hub's defaults (§7.2, steps 2 and 5).
+- These are signed tokens, not published records.
+- A hub admin decides whether to accept vouched users, and from which leaves.
+
 ## 7. Assets and avatars
 
 ### 7.1 Where assets live
@@ -350,7 +412,11 @@ records, and other hubs subscribe to them.
   agreements, and game catalogues may need a broader root (for example a
   separate `io.zerosquared.*` group), with shared schemas kept in this repo.
   Settle before any of these records are published, since names are
-  permanent.
+  permanent. Records needed so far: leaf listing, status, stats, ads, game
+  catalogue, hub request and agreement (leaf side); offer, agreement,
+  observed status (hub side); avatar wardrobe and default (user side, unless
+  at3d.app's types cover them). Links and vouched identities (§6.3, §6.4)
+  are not records.
 - Which tunnel software also carries real-time UDP traffic, or whether that
   needs a separate relay (TURN, QUIC).
 - Exact offer, request, and agreement fields; how usage summaries are
@@ -359,4 +425,5 @@ records, and other hubs subscribe to them.
 - Whether presence, the lobby, and common-space features are part of the hub
   or a separate service beside it.
 - Federation model for common spaces (§10).
-- How handoff tickets are issued and checked (§5.3).
+- How handoff tickets are issued and checked (§5.3), and the format of
+  leaf-vouched statements (§6.4); possibly the same mechanism.
