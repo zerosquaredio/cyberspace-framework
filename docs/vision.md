@@ -274,7 +274,13 @@ coolbbs") signed with the leaf DID's key. The hub shows them as
 - The identity doesn't carry to other leaves, and it has no AT repo, so
   avatars come from the leaf or the hub's defaults (§7.2, steps 2 and 5).
 - These are signed tokens, not published records.
-- A hub admin decides whether to accept vouched users, and from which leaves.
+- Both sides opt in:
+  - **The leaf admin** decides whether the leaf vouches for its users at
+    all, since vouching shows their usernames to the hub.
+  - **The hub admin** decides whether to accept vouched users, and from
+    which leaves.
+- **The hub admin sets what vouched users may do,** per feature: for
+  example chat but not voice, or joining lobbies but not creating them.
 
 ## 7. Assets and avatars
 
