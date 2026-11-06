@@ -43,3 +43,11 @@ Working on the submodules and updating their pins: [WORKFLOW.md](WORKFLOW.md).
 | **Common space** | Where people on a hub meet, whatever leaf they are using |
 
 More in [docs/vision.md](docs/vision.md) §2.
+
+## License
+
+Code is under the [BSD 2-Clause License](LICENSE), matching ENiGMA½. Docs are
+under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Record type
+schemas will be [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+Running your own hub or leaf, open or closed, is fine; improvements sent back
+are very welcome ([CONTRIBUTING.md](CONTRIBUTING.md)).
