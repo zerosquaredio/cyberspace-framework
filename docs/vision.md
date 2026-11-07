@@ -31,6 +31,27 @@ Nexus Lounge (BBSes plus a hub) is the first piece of it.
 | **Common space** | Where people on a hub meet, whatever leaf they are using: text, voice, avatars, and later 3D environments |
 | **Client tier** | What a person's client can do: web page, desktop app, VR headset. Everyone takes part at the level their client supports |
 
+### 2.1 What goes over AT
+
+AT Protocol is a general network: identity, repositories of records, and
+sync between servers. Bluesky is one application on it, with its own record
+types (`app.bsky.*`); the framework defines its own types the same way and
+needs nothing added to AT.
+
+AT records are **public, permanent, signed, and broadcast** to anyone
+following the network. That decides what goes in them:
+
+| Kind of data | Carried by | Examples |
+|---|---|---|
+| Lasting public facts | AT records | Leaf listings, hub offers and agreements, game catalogues, avatar wardrobes (§4.1, §7, §9.2) |
+| Private, live, or point-to-point | The framework's own transport: tunnels, WebRTC, hub services | Terminal sessions, chat, voice, presence, lobbies, game networks, per-leaf avatar choices (§5, §7.2, §8) |
+
+Bluesky made the same split: its DMs are a separate chat service, not AT
+records. Users can still call hub services as themselves without a separate
+login, through their PDS's service proxying
+([hub spec](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/hub.md)
+§5.2).
+
 ## 3. Layers and stages
 
 | Stage | Hub provides | Users get |
