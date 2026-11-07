@@ -52,6 +52,31 @@ login, through their PDS's service proxying
 ([hub spec](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/hub.md)
 §5.2).
 
+### 2.2 Record type names
+
+Decided 2026-11-06. Record types use the NSID root **`nexus.cyberspace`**,
+from the framework's domain `cyberspace.nexus`. The domain belongs to the
+framework rather than to a person, so it can be handed to a community. Names
+are grouped by **whose repo the record lives in**:
+
+| Group | Lives in | Records so far |
+|---|---|---|
+| `nexus.cyberspace.leaf.*` | A leaf's repo (a BBS today) | `listing`, `status`, `stats`, `ad`, game catalogue entries, hub `request` and `agreement` |
+| `nexus.cyberspace.hub.*` | A hub's repo | `offer`, `agreement`, `observedStatus`; also the hub's API methods (e.g. `listLeaves`, `getLeaf`) |
+| `nexus.cyberspace.actor.*` | A user's repo | Avatar wardrobe and default, only if at3d.app's record types don't cover them (§7) |
+| `nexus.cyberspace.dev.*` | Throwaway test accounts | Anything during development; never used for real data |
+
+- Each group is its own Lexicon authority, so each needs a DNS TXT record
+  (`_lexicon.leaf.cyberspace.nexus`, `_lexicon.hub.cyberspace.nexus`, and so
+  on) naming the project account that publishes the schemas. These are added
+  when the first schemas are published (Nexus Lounge F9), not before.
+- New groups can be added later without affecting existing names.
+- Names and fields are permanent once published; drafts and the change rules
+  are in the [publishing spec](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/publishing.md) §3.
+- Schemas will live in this repo's `lexicons/` directory, under CC0.
+- The reference hub uses `hub.cyberspace.nexus`; other hubs use their own
+  domains.
+
 ## 3. Layers and stages
 
 | Stage | Hub provides | Users get |
@@ -434,16 +459,9 @@ records, and other hubs subscribe to them.
 
 ## 11. Open questions
 
-- **Record type names beyond BBSes.** Nexus Lounge's decided root is
-  `io.zerosquared.bbs.*` (publishing spec §3). Non-BBS leaves, hub offers and
-  agreements, and game catalogues may need a broader root (for example a
-  separate `io.zerosquared.*` group), with shared schemas kept in this repo.
-  Settle before any of these records are published, since names are
-  permanent. Records needed so far: leaf listing, status, stats, ads, game
-  catalogue, hub request and agreement (leaf side); offer, agreement,
-  observed status (hub side); avatar wardrobe and default (user side, unless
-  at3d.app's types cover them). Links and vouched identities (§6.3, §6.4)
-  are not records.
+- ~~**Record type names beyond BBSes.**~~ Decided: `nexus.cyberspace.*`,
+  grouped by role (§2.2). Links and vouched identities (§6.3, §6.4) are not
+  records.
 - Which tunnel software also carries real-time UDP traffic, or whether that
   needs a separate relay (TURN, QUIC).
 - Exact offer, request, and agreement fields; how usage summaries are
