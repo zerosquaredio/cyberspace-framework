@@ -441,6 +441,14 @@ busy a link is). It never shows an individual's activity unless they have
 turned presence on (§8). Because the data is public, anyone can build
 their own view of it, in the space or outside it.
 
+**Views are assets too.** A view (the code and models that turn this data
+into a picture, whether a 2D map on a web page or a whole 3D landscape) is
+made, shared, and traded like any other asset (§7, §8.1): people develop
+their own, others pick the one they like or remix it, and a hub or leaf
+can offer its own as the default. A simple 2D map on the hub's web page
+could be the first one, once leaves publish listings and the hub
+publishes observed status.
+
 ## 9. Games
 
 The BBS world already has a precedent: door networks such as DoorParty and
