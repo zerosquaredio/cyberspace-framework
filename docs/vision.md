@@ -22,6 +22,16 @@ each useful on its own, from text terminals today toward 3D and VR spaces.
 
 Nexus Lounge (BBSes plus a hub) is the first piece of it.
 
+**Easy by default, better with effort.** Starting a leaf should take no
+networking knowledge: a ready-made image, an outbound tunnel to a hub, no
+open ports, domains, or certificates, and it may be up only part of the
+time. Admins who are comfortable doing more can turn on more efficient
+options as they go, such as direct ports for SSH or telnet, their own
+public address, or a direct source for their assets, and each such option
+makes the whole system work better (less load on hubs, faster
+connections). The default path always works on its own; the options are
+improvements, never requirements (§5.1).
+
 ## 2. Terms
 
 | Term | Meaning |
