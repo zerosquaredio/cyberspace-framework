@@ -32,6 +32,13 @@ makes the whole system work better (less load on hubs, faster
 connections). The default path always works on its own; the options are
 improvements, never requirements (§5.1).
 
+**The hacker ethos.** Things should work, and common users need a way to
+authenticate (AT identity); beyond that, everything should be open source,
+modifiable, and extendable. People should be able to take it apart, change
+it, and build on it, from running their own leaf or hub to programming
+things inside the shared space (§8.1). This is also why the core of each
+layer must be software we fully control and can fork (hub spec §5.3).
+
 ## 2. Terms
 
 | Term | Meaning |
@@ -404,6 +411,35 @@ our own where they fit.
   servers map onto leaves or the hub's default space, and its metaverse
   server onto the hub directory, so the work is linking its accounts and
   directory to AT identities rather than building an engine.
+
+Ideas for the 3D stage (direction, not yet designed):
+
+### 8.1 Building in the space
+
+The space should have a built-in way to create and program things from
+inside it: make an object, write the code that makes it behave, and share
+it, without leaving the space. Overte already runs JavaScript scripts on
+objects and in clients, which is a starting point (to be confirmed when
+trying it). Scripts and the assets they drive would be ordinary assets
+(§7), stored where their author chooses and shareable like any other.
+Code from other people runs sandboxed, with permissions the space's owner
+(hub or leaf admin) sets.
+
+### 8.2 The network made visible
+
+Hubs and leaves should be things you can see and touch in the space, like
+the old cyberpunk pictures of the internet: each leaf an object you can
+walk up to, read (its listing, status and hours), and enter (its terminal
+or its own space), with the connections between them drawn as lines of
+data, such as tunnels to the hub, peering between BBSes (networking spec),
+and links between federated hubs (§10).
+
+Most of this comes from public data that already exists: leaves' listings
+and status, hubs' observed status and agreements, all AT records (§2.1),
+plus live, aggregate figures from the hub (which leaves are connected, how
+busy a link is). It never shows an individual's activity unless they have
+turned presence on (§8). Because the data is public, anyone can build
+their own view of it, in the space or outside it.
 
 ## 9. Games
 
