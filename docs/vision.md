@@ -119,7 +119,7 @@ records so anyone can check it:
 
 | Record | In whose repo | Says |
 |---|---|---|
-| **Offer** | Hub | What the hub relays, bandwidth limits, theme or community, rules, terms (free, a suggested contribution, or a price) |
+| **Offer** | Hub | What the hub relays, the services it runs for people (§8: text chat, voice, which kinds of view, 3D), bandwidth limits, theme or community, rules, terms (free, a suggested contribution, or a price) |
 | **Request** | Leaf | The leaf's services, the traffic it expects, the offer terms it accepts |
 | **Agreement** | Both: one record each, pointing at the other | The leaf is carried by the hub on these terms. Either side ends it by deleting its half |
 
@@ -143,6 +143,35 @@ leaves compare them with their own logs. Stronger measures can come later.
 
 Any hub runs the same open software, and nothing ties a leaf to one hub. A
 hub and a leaf may also run on the same machine.
+
+### 4.4 Sizing a hub
+
+Someone setting up a hub needs to know what each service (§8) will cost
+them for the number of people they expect. Over time the network itself
+can answer that:
+
+- **Hubs measure themselves.** The software already meters usage (§4.2);
+  it also records, per service (text, voice, relay, 3D, assets):
+  bandwidth per active user, peak people at once, CPU and memory, and
+  monthly totals.
+- **Hubs may publish those figures** as an opt-in stats record in the
+  hub's AT repo, like a leaf's stats record (publishing spec §3.5).
+  Anyone can collect them from every hub that publishes, with no central
+  service, and turn them into a calculator: "100 people, text and voice,
+  no 3D: about this much bandwidth, this size of server".
+- **Usage is shared, not money.** Prices vary by provider and change
+  often, and admins needn't reveal their bills. The calculator multiplies
+  shared usage by current prices for the provider being considered.
+- **Privacy:** only totals, rounded, per service, and only from hubs
+  above a minimum size, since on a tiny hub the figures could reveal what
+  particular people did.
+- **Before there is real data,** a load-test tool connects simulated
+  users (chatting, talking, moving) to a test hub to give first figures
+  per service, and catches regressions as the software changes. Real
+  figures gradually replace them.
+- **On a running hub,** the admin's dashboard projects from its own
+  figures ("at this growth, you'll pass your bandwidth allowance in about
+  two months").
 
 ## 5. Transport
 
@@ -425,6 +454,21 @@ rating, and its lower levels of detail (§8.3) can serve as the fallback.
 - Interaction depends on the leaves connected, each person's client tier,
   and the hub admin's settings. New users (with no account on any leaf) may
   be allowed in, if the hub admin chooses.
+- **Hubs choose which services they run** (2026-11-08). One hub may offer
+  text chat only; another text and ANSI or 2D views; another text and
+  voice but no 3D; another only a VR space, with its own voice and no
+  separate chat. Each is a legitimate hub, and the choice is partly cost:
+  text is cheap, while voice rooms, relays and 3D need bandwidth and
+  servers. The services are listed in the hub's offer (§4.1) and its
+  manifest (§8.3), so:
+  - leaves and people can browse hubs by what they offer;
+  - clients show only the views and features the hub supports;
+  - a view needs the services it relies on as well as the model
+    extensions (a 3D view on a text-only hub doesn't fit).
+
+  The software is the same for every hub (§4.3); these are switches, not
+  forks. Federated hubs (§10) may offer different services, and what
+  crosses between them is what both support.
 - **The hub works like a co-working space** (2026-11-08), at its simplest
   with no 3D at all:
   - **Text chat like IRC:** the hub is one big room by default, with
@@ -521,8 +565,10 @@ lexicons do:
   server rack is a leaf, a quest marker is an entity with a label and
   icon. A view that doesn't know an extension still draws something
   sensible. Unknown fields are ignored, never an error.
-- **A manifest:** the hub lists its core version and extensions; a view
-  lists the extensions it uses and the ones it requires. Clients show
+- **A manifest:** the hub lists its core version, extensions and services
+  (§8); a view lists the extensions and services it uses and the ones it
+  requires. Even a text-only hub publishes the core (who is present,
+  channels as groups), which is cheap and lets simple views work. Clients show
   each view as working fully, working without something ("no team
   colors on this hub"), or not fitting. Most views should need nothing
   beyond the core.
