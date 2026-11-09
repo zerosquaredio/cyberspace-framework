@@ -369,6 +369,13 @@ What follows from it:
   updated, clients following the new routes. The old hub keeps a forwarding
   note for a grace period, like an HTTP 301. Users are bound to DIDs too, so
   their accounts on the leaf don't depend on the hub.
+- **The leaf's own account says where it is now.** Its listing record
+  carries its current addresses under a DID that doesn't change, and a
+  post tells its followers, who follow the DID, not the handle, so they
+  stay even if a hub-issued handle is lost. This is the one channel
+  neither hub controls: it still works when the old hub won't forward
+  (a leaf that was dropped, or left on bad terms), and it works the
+  same for a leaf with no hub at all.
 - **Multi-homing:** a leaf may be carried by more than one hub at once (say
   a themed hub and a high-bandwidth one), if the hubs' rules allow it.
 
@@ -404,11 +411,14 @@ Levels of participation:
 | **No account anywhere** (visitor) | Browse the directory, connect to leaves, apply on leaves that take new users |
 | **Leaf account only** | Everything they could before, through the hub |
 | **Leaf account, vouched for by the leaf** (§6.4) | Appear in the common space as `alice@coolbbs`, chat, join lobbies, as that leaf's user only |
-| **AT account** | Full hub membership: one identity across all leaves, avatars from their own repo, presence, everything across leaves |
+| **AT account, no leaf** | Sign in to the hub, browse the directory, connect to leaves, apply on leaves that take new users. The common space only if the hub admin lets such people in (§8.7) |
+| **AT account, member of a connected leaf** | Full hub membership: one identity across all leaves, avatars from their own repo, presence, the common space, everything across leaves |
 
 There is **no separate hub registration**: logging in to the hub with AT is
 the hub account. The hub keeps a small profile keyed by DID, created at
-first login, and stores no passwords.
+first login, and stores no passwords. Taking part in the common space
+is a further step: by default it is for members of the hub's leaves
+(§8.7).
 
 **Linking an existing leaf account to AT** works from both directions, and
 needs proof of both sides (the leaf password and the AT approval):
@@ -581,8 +591,9 @@ rating, and its lower levels of detail (§8.3) can serve as the fallback.
   space. It is opt-in, like member activity elsewhere: off unless the person
   turns it on.
 - Interaction depends on the leaves connected, each person's client tier,
-  and the hub admin's settings. New users (with no account on any leaf) may
-  be allowed in, if the hub admin chooses.
+  and the hub admin's settings. By default the common space is for
+  members of the hub's leaves; people with no account on any leaf are
+  let in only if the hub admin chooses (§8.7).
 - **Hubs choose which services they run** (2026-11-08). One hub may offer
   text chat only; another text and ANSI or 2D views; another text and
   voice but no 3D; another only a VR space, with its own voice and no
@@ -842,9 +853,21 @@ statement. What they may do there is the hub admin's choice (§6.4).
 
 ### 8.7 Blocking and moderation
 
-*Direction, 2026-11-08.* Who moderates a common space is a social
-agreement, and it differs from hub to hub, so it is configurable. Some
-powers exist under every agreement:
+*Direction, 2026-11-08.*
+
+**Trust, and the freedom to leave.** None of what follows is airtight,
+and it isn't meant to be. What keeps a hub healthy is the relationship
+between its admin and its leaves' admins, and that either can end it: a
+hub can drop a leaf that causes trouble, and a leaf can leave a hub it
+disagrees with and join another, keeping its identity and its members
+(§4.3, §6.1). The tools below make everyday problems easy to deal with;
+the framework's real job is to keep leaving cheap for both sides. There
+will always be cases nobody thought of, and those are settled between
+people, not by the software.
+
+Who moderates a common space is a social agreement, and it differs from
+hub to hub, so it is configurable. Some powers exist under every
+agreement:
 
 - **Anyone can mute or hide someone for themselves.** It changes only
   what they see and hear, so it needs no one's permission (as personal
@@ -861,12 +884,35 @@ powers exist under every agreement:
   its block to the hub, which honors it according to the agreement
   below.
 
+**Who may join at all.** By default, only members of a leaf connected
+to the hub take part in the common space (decided 2026-11-08). So
+everyone in it was let in by some leaf admin, who can be asked about
+them, and a blocked person who makes a new AT account must first be
+admitted by a leaf before they are back. It is not airtight (a leaf
+with open admission is hardly a gate), so the hub admin can adjust it:
+
+- **Who:** leaf members only (the default); anyone with an AT account;
+  or, later, visitors with no account at all.
+- **Which leaves count:** for example, not those whose admission is
+  simply `open` (their listing says, publishing spec §3.1).
+- **A waiting period:** a member of a leaf for at least so many days.
+- **Leaf standing:** the hub sees which leaf each person came in
+  through, so a leaf that keeps admitting troublemakers stops counting.
+
+The hub learns that someone is a member from the leaf: a signed
+statement, the same as a presence report (§8.6), made only for members
+who have chosen to take part, and never published.
+
 A block has a scope (one room, or the whole common space) and may be for
 a time or permanent. Being banned from a leaf and being blocked from the
 hub are separate, unless the agreement joins them.
 
-**The moderation agreement** is set by the hub admin and stated in the
-hub's offer (§4.1), so leaf admins know it before joining:
+**The moderation agreement** is set by the hub admin and stated in
+plain words in the hub's offer (§4.1), so leaf admins know it before
+joining. The software doesn't encode agreements; it provides the pieces
+(moderators, each with the powers the hub admin gives them, over
+everyone or only their own leaf's members), and a hub arranges them to
+match what it has agreed. Three common starting points:
 
 | Model | Who moderates the common space |
 |---|---|
@@ -879,7 +925,8 @@ hub's offer (§4.1), so leaf admins know it before joining:
 - Someone blocked is told whether the hub or a leaf did it, and how to
   ask for it to be reviewed.
 - Block lists are private to the hub, never AT records.
-- **Evasion:** new AT accounts are free, so a hub may ask more of people
+- **Evasion:** new AT accounts are free, which is why membership of a
+  leaf is the default gate (above). Beyond it, a hub may ask more of people
   before they join the common space (account age, or an attestation,
   with the verifiers leaves already use). For vouched users the leaf is
   accountable: a leaf whose users keep causing trouble loses vouching.
