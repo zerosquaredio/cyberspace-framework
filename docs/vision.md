@@ -81,6 +81,7 @@ are grouped by **whose repo the record lives in**:
 | `nexus.cyberspace.leaf.*` | A leaf's repo (a BBS today) | `listing`, `status`, `stats`, `ad`, game catalogue entries, hub `request` and `agreement` |
 | `nexus.cyberspace.hub.*` | A hub's repo | `offer`, `agreement`, `observedStatus`; also the hub's API methods (e.g. `listLeaves`, `getLeaf`) |
 | `nexus.cyberspace.actor.*` | A user's repo | Avatar wardrobe and default, only if at3d.app's record types don't cover them (§7) |
+| `nexus.cyberspace.space.*` | Nowhere: not records | The shape of a hub's live model (§8.3), defined as Lexicon schemas for a hub's live stream and queries, so it stays out of AT repos (§2.1) |
 | `nexus.cyberspace.dev.*` | Throwaway test accounts | Anything during development; never used for real data |
 
 - Each group is its own Lexicon authority, so each needs a DNS TXT record
@@ -109,6 +110,77 @@ VR still appears (as a small avatar) and can chat with people who are in VR.
 
 Leaves may also run their own private spaces (for example a VR-only leaf)
 that people use separately from the hub's common space.
+
+### 3.1 How settled each part is
+
+This document mixes decisions with ideas. As of 2026-11-08:
+
+| Part | Status |
+|---|---|
+| Identity: leaves and users as AT accounts (§6.1 to §6.4) | **Decided**, and built for BBSes |
+| Record type names (§2.2) | **Decided** |
+| Stage 1: directory and tunnel | **Planned in detail** (Nexus Lounge hub plan) |
+| The 3D software: Overte (§8) | **Decided** as a choice; untested (§11) |
+| Offers and agreements, sizing (§4) | Direction |
+| Transport policy, routes, handoff, connections between users (§5) | Direction |
+| Assets, avatars, themes and ratings (§7.1 to §7.3) | Direction; rating rules drafted in the hub spec |
+| The hub as a co-working space; chat and voice (§8) | Direction |
+| The live model and views (§8.3) | Direction |
+| Games (§9) | Direction |
+| Where presence comes from (§8.6) | **Decided** |
+| What comes next (§3.2) | **Decided** |
+| Blocking and moderation (§8.7) | Direction |
+| Signing in once, by hub ticket (§6.5) | Direction; wanted with stage 4, not needed for BBSes in a browser |
+| Avatar budgets, building in the space, the visible network, personal views, agents (§7.4, §8.1, §8.2, §8.4, §8.5) | Ideas |
+| Hub federation (§10) | Idea |
+
+### 3.2 What comes next, and what is parked
+
+*Decided 2026-11-08.* After stage 1, the next thing built is a small
+first slice of stage 2, not 3D: it is far cheaper, everyone can use it
+whatever their client, and it is what makes a hub a place rather than a
+list.
+
+**The first slice of the common space:**
+
+1. People sign in to the hub with AT, and get a hub profile (§6.3).
+2. Presence, from the hub's own client and from leaves reporting it,
+   including members without an AT account where the leaf and the hub
+   allow it (§8.6). This needs a small BBS feature.
+3. Text chat: one room, ephemeral (§8).
+4. The core live model, as a stream (§8.3).
+5. Two views of it: a 2D map on the hub's web page, and an ANSI view
+   that runs as a door on a BBS.
+6. The basics of blocking (§8.7): muting someone for yourself, the hub
+   admin blocking someone, and a leaf admin keeping a member out.
+
+In the plans these are Nexus Lounge hub features H13 to H18 and BBS
+features F18 and F19.
+
+Done when two people using different BBSes see each other on the map and
+chat, one from a browser and one from inside a BBS terminal.
+
+**After that,** roughly in order: voice; assets and avatars (stage 3);
+3D with Overte (stage 4), and with it tickets for signing in once
+(§6.5), which the 3D clients and non-BBS leaves are the first to need.
+
+**Any time:** the Overte experiments (run a domain, try the client, test
+the three untested assumptions, §11). They are cheap, and they decide
+whether stage 4 is practical as designed.
+
+**Parked:** written down so the design leaves room for them, but not
+planned until the stages above exist:
+
+- overlay networks for game sessions (§5.4), and native game downloads
+  (§9.3);
+- hub federation (§10) and multi-homed leaves;
+- agents (§8.5) and building in the space (§8.1);
+- a browser and WebXR client for Overte worlds;
+- paid, ID and age verification (so adult spaces wait too; adult leaves
+  can still be listed, by rating);
+- a hub-run PDS for leaf and user accounts;
+- published sizing figures and the load-test tool (§4.4);
+- BBS clusters (Nexus Lounge networking spec).
 
 ## 4. Hubs and leaves
 
@@ -251,7 +323,7 @@ Same-machine leaves need no tunnel: the hub proxies to a local socket.
 
 ### 6.1 Decision: every leaf has its own DID
 
-*Proposed 2026-11-06.* This confirms the BBS account in Nexus Lounge's
+*Decided 2026-11-06; first built 2026-11-08 (Nexus Lounge F9).* This confirms the BBS account in Nexus Lounge's
 [publishing spec](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/publishing.md)
 §2 and extends it to every kind of leaf.
 
@@ -285,7 +357,9 @@ What it commits us to:
 - **Hubs authenticate leaves by DID.** A tunnel proves it belongs to the
   leaf's DID (AT service auth, signed with the DID's key), and the hub checks
   that against the agreement (the hub spec, §1.2, already has tunnels
-  authenticate as the BBS's DID).
+  authenticate as the BBS's DID). This arrives in stages: a tunnel token
+  first, then the leaf's DID, then agreements (Nexus Lounge hub plan,
+  H3).
 - **Hub-issued handles and addresses are conveniences, not identity.** A
   leaf moving hubs keeps its DID; its handle can change.
 
@@ -373,6 +447,61 @@ coolbbs") signed with the leaf DID's key. The hub shows them as
     which leaves.
 - **The hub admin sets what vouched users may do,** per feature: for
   example chat but not voice, or joining lobbies but not creating them.
+
+### 6.5 Signing in once
+
+*Direction, 2026-11-08; not needed for BBSes in a browser, and not built
+until something needs it.* The hub and every leaf are separate AT login
+clients, so a person approves at their account host once for the hub and
+once for each leaf they open.
+
+**For BBSes in a browser that is fine.** It is one approval per board,
+the first time; after that the board's own web sign-in logs them in with
+one click, and SSH callers have their saved key.
+
+**It becomes a real need for:**
+
+- **Clients with no convenient browser:** a VR headset or desktop app
+  opening a leaf from inside the space, or moving from one BBS to another
+  from inside a terminal.
+- **Leaves that aren't BBSes:** a full AT login means publishing client
+  details, holding keys and receiving callbacks. Reasonable for a BBS;
+  heavy for a small game server, a chat room or an Overte world. Checking
+  a signed ticket is a few lines of code, so for them it is how they
+  learn who someone is at all. (Overte already works this way: a world
+  trusts its accounts server's word.)
+- **Handoff to a direct address** (§5.3), where the leaf must know who
+  is arriving without a fresh login.
+
+**For those: a leaf may accept a ticket from a hub it trusts, as one
+more login type.**
+
+- The person is signed in to the hub. When they open a leaf from the
+  hub, the hub gives their client a ticket: their DID, the leaf's DID as
+  the audience, an expiry a minute or so away, and a one-time number,
+  signed with the hub's key (published in the hub's DID document).
+- The leaf checks the signature, that the ticket is for itself, and that
+  it hasn't been used. It then treats the DID as proven and continues
+  exactly as after its own login: admission, account status and any
+  two-factor rules still apply.
+- **Off by default, and both sides opt in.** The leaf admin lists the
+  hubs whose tickets the leaf accepts.
+- **The cost is trust:** the leaf takes the hub's word for who someone
+  is, so a dishonest or broken-into hub could enter as anyone on the
+  leaves that trust it. So admins never log in by ticket unless the leaf
+  admin says otherwise, and a leaf that has its own AT login can require
+  it the first time a DID appears.
+- A leaf with its own AT login keeps it, so it never depends on the hub.
+
+Alternatives considered: the hub as the login client for all its leaves
+(simplest for admins, but the hub sees every login and leaves can't work
+without it); and separate logins only (today's behavior, and enough for
+BBSes).
+
+This is the handoff ticket of §5.3, and the mirror of a leaf-vouched
+statement (§6.4): there the leaf vouches for a person to the hub, here
+the hub vouches to the leaf. One signed-statement format should serve
+all three.
 
 ## 7. Assets and avatars
 
@@ -478,6 +607,10 @@ rating, and its lower levels of detail (§8.3) can serve as the fallback.
     A channel can turn logging on, and then shows that it is logged.
     Nothing stops participants keeping their own logs, so "not logged"
     means the hub keeps no record, not that the chat is private.
+  - **Moderation without logs:** the hub keeps a short rolling buffer
+    (minutes, in memory) so a report can carry what was just said, and
+    a reporter's client can attach what it saw. Without that, an abuse
+    report in an unlogged room has no evidence.
   - **Voice like Zoom,** again one big room by default, with smaller
     rooms and calls. Small calls go direct between people where they can
     (§5.4). Past about five people, everyone sending to everyone stops
@@ -535,8 +668,9 @@ publishes observed status.
 
 ### 8.3 Views and the live model
 
-Once there is a space (anyone present, in 3D or not), the hub publishes a
-**live model** of it: who is present, groups (who is talking together, or
+Once there is a space (anyone present, in 3D or not), the hub serves a
+**live model** of it, as a live stream from the hub, never as AT records
+(§2.1): who is present, groups (who is talking together, or
 standing together in 3D), links between people and things, leaves and
 their connections, and positions where there are any. A view is a
 renderer of that model. The same model can be shown as:
@@ -555,9 +689,9 @@ their model (teams, scores, traffic). If each hub defined its own, a view
 would work only on the hubs it was written for. So, as glTF, IRCv3 and AT
 lexicons do:
 
-- **A small core model that every hub publishes,** defined by the
-  framework and versioned (record types such as
-  `nexus.cyberspace.space.*`): entities (people, leaves, rooms), presence,
+- **A small core model that every hub serves,** defined by the
+  framework and versioned (Lexicon schemas under
+  `nexus.cyberspace.space.*`, §2.2): entities (people, leaves, rooms), presence,
   groups, links, and optional positions. Every view renders the core, so
   any view works on any hub, at least at a basic level.
 - **Everything else is a named extension** (`org.somehub.teams`), and
@@ -566,7 +700,8 @@ lexicons do:
   icon. A view that doesn't know an extension still draws something
   sensible. Unknown fields are ignored, never an error.
 - **A manifest:** the hub lists its core version, extensions and services
-  (§8); a view lists the extensions and services it uses and the ones it
+  (§8), as part of its offer record (§4.1), so there is one public
+  statement of what a hub provides; a view lists the extensions and services it uses and the ones it
   requires. Even a text-only hub publishes the core (who is present,
   channels as groups), which is cheap and lets simple views work. Clients show
   each view as working fully, working without something ("no team
@@ -663,6 +798,96 @@ Agents could change the environment or models on someone's behalf.
   space can be steered by whatever others put there. So no agent holds
   more power than its one task needs.
 
+### 8.6 Where presence comes from
+
+*Decided 2026-11-08.* The hub relays a terminal session without knowing
+who is in it (§6.3): the person proves who they are to the leaf, not to
+the hub. So presence needs a source, and the hub never guesses it from
+traffic. There are two, and **both are part of the first slice** (§3.2),
+so that people who connect by SSH or at a leaf's own address aren't
+missing from the space:
+
+1. **The hub's own client.** Someone signed in to the hub who opens a
+   leaf from the hub's page or app: the hub knows which leaf they opened
+   and when that connection ends. Needs nothing from the leaf, so it
+   works with any BBS software.
+2. **The leaf reports it.** The leaf tells the hub "this person is
+   here", over its connection to the hub, signed as the leaf. This covers
+   every kind of session, and can carry finer detail the person chooses
+   to show (in the doors, in a chat room). It needs a leaf-side feature,
+   off by default, which the leaf admin turns on.
+
+**People without an AT account can be reported too,** if the leaf admin
+chooses: the report then names a local user rather than a DID, and the
+hub shows them as `alice@coolbbs`. This is the leaf-vouched identity of
+§6.4, in the same signed format, and as there the hub admin chooses
+whether to accept them, from which leaves, and what they may do.
+
+**A leaf's word is only a leaf's word.** A leaf could claim that any
+DID is on it, and speak as them. So whatever arrives through a leaf is
+shown as coming through it (`alice via coolbbs`), and counts as that
+AT account's own presence only once the person, signed in to the hub
+themselves, has confirmed that leaf, once.
+
+Consent applies to both sources, and the stricter setting wins: the leaf
+admin turns reporting on, each member then chooses whether they are
+shown, and a person signed in to the hub has their hub setting too. The
+rating rule also applies: presence on a leaf is shown only in spaces
+rated at or above it (hub spec §5.4).
+
+**Later:** letting someone with no AT account into the common space
+itself, not only shown in it. For example their leaf gives them a link
+that opens the hub's page as `alice@coolbbs`, carrying a vouched
+statement. What they may do there is the hub admin's choice (§6.4).
+
+### 8.7 Blocking and moderation
+
+*Direction, 2026-11-08.* Who moderates a common space is a social
+agreement, and it differs from hub to hub, so it is configurable. Some
+powers exist under every agreement:
+
+- **Anyone can mute or hide someone for themselves.** It changes only
+  what they see and hear, so it needs no one's permission (as personal
+  views, §8.4). The first line of defence, and the cheapest.
+- **The hub admin can block anyone from the common space:** an AT user
+  by DID, which follows them whatever leaf they come through; a vouched
+  user by name and leaf; or everyone a leaf vouches for. The hub admin
+  always has the last word, since the hub carries the legal exposure
+  (hub spec §8).
+- **A leaf admin can keep their own members out of the common space.**
+  For a member the leaf vouches for, that is complete: no vouching, no
+  entry. For a member with an AT account, the leaf stops reporting them,
+  but they can still sign in to the hub by themselves; the leaf can pass
+  its block to the hub, which honors it according to the agreement
+  below.
+
+A block has a scope (one room, or the whole common space) and may be for
+a time or permanent. Being banned from a leaf and being blocked from the
+hub are separate, unless the agreement joins them.
+
+**The moderation agreement** is set by the hub admin and stated in the
+hub's offer (§4.1), so leaf admins know it before joining:
+
+| Model | Who moderates the common space |
+|---|---|
+| **Hub-moderated** | The hub admin, and moderators they appoint. Leaf admins can report |
+| **Shared** | Some or all leaf admins are moderators too, with the powers the hub admin gives them (mute, remove from a room, block for a time, block permanently). Their blocks of AT users apply across the hub |
+| **Each leaf its own** | Each leaf admin is responsible for their own members and can act only on them. The hub admin handles the rest |
+
+- Moderators are named by DID, and every action is recorded with who
+  took it (the actions, not the chat, which stays unlogged, §8).
+- Someone blocked is told whether the hub or a leaf did it, and how to
+  ask for it to be reviewed.
+- Block lists are private to the hub, never AT records.
+- **Evasion:** new AT accounts are free, so a hub may ask more of people
+  before they join the common space (account age, or an attestation,
+  with the verifiers leaves already use). For vouched users the leaf is
+  accountable: a leaf whose users keep causing trouble loses vouching.
+- Optionally, a hub can follow a shared block list, such as a Bluesky
+  moderation list, and leaves and hubs can share theirs, each deciding
+  whether to honor the other's (as between peered BBSes, Nexus Lounge
+  networking spec §6).
+
 ## 9. Games
 
 The BBS world already has a precedent: door networks such as DoorParty and
@@ -740,3 +965,12 @@ records, and other hubs subscribe to them.
 - Federation model for common spaces (§10).
 - How handoff tickets are issued and checked (§5.3), and the format of
   leaf-vouched statements (§6.4); possibly the same mechanism.
+- Chat software: an IRCv3 server, or our own over WebSocket (§8).
+- Moderation: the exact powers in each model, how a leaf's block is
+  passed to the hub, and how reviews work (§8.7).
+- How the live model is carried (WebSocket stream, as the directory's
+  live updates, hub spec §5.2) and how its core is versioned (§8.3).
+- How view code is sandboxed in each runtime, Overte's especially (§8.4).
+- Overte: whether its accounts server can be self-hosted, whether a
+  relay can carry a home-based domain's traffic, and how far the old
+  web SDK has drifted (Overte evaluation §4, §5). All untested.
