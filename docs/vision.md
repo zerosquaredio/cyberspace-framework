@@ -408,6 +408,15 @@ theme, and adult spaces admit only visitors with an age attestation the
 hub accepts. Details: [hub spec](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/hub.md)
 §5.4.
 
+### 7.4 Avatar budgets
+
+One person's heavy avatar can slow everyone else's client. So each space
+sets an **avatar budget** (triangles, texture memory, and the like), and
+avatars over it are shown to others as a simpler fallback; people can
+also choose to hide heavy avatars themselves. VRChat's performance ranks
+are the precedent. An avatar's cost is asset metadata, next to its
+rating, and its lower levels of detail (§8.3) can serve as the fallback.
+
 ## 8. Common space and presence
 
 - **Presence** (who is on which leaf, and where) is the core of the shared
@@ -525,6 +534,49 @@ lexicons do:
   major version the core only grows, so existing views keep working.
 
 Mismatches then cost detail, not breakage.
+
+**Requirements and levels of detail.** Views vary widely, from a terminal
+to Overte, and may need different client applications and hardware.
+Rather than "needs a discrete GPU and 100 Mbps", which goes stale, a view
+or asset describes **what it uses**:
+
+- the **runtime** it needs (terminal, browser, WebGL2 or WebGPU, WebXR,
+  Overte): the one hard requirement;
+- its **download size** and **steady bandwidth**;
+- a **rendering budget** (triangles, texture memory, draw calls).
+
+The client knows its own hardware and connection, compares, and says
+"should run well", "may be choppy" or "can't run". The figures stay true
+as hardware changes; only the verdicts change. Where it can, a view or
+asset also ships **levels of detail**: lower-detail models and compressed
+formats (glTF already has these: meshopt or Draco meshes, KTX2 textures),
+as streaming video offers several bitrates. Each client picks the level
+it can handle and drops down when it struggles, so a slow machine gets a
+coarser picture rather than a broken one. People still find what suits
+them mostly by trying views. Optionally, clients could report how a view
+ran (opt-in, anonymous), so its listing can say "runs well on most
+machines like yours".
+
+**Slow clients don't hold back the space.** The hub never waits for its
+slowest client:
+
+- The hub holds the state, and sends each client only what is near it,
+  at a rate that client can take; stale position updates are dropped or
+  merged, since only the latest matters. A slow client falls behind
+  alone.
+- Voice through the media server gives each listener a quality that
+  suits their connection; a listener's bad line affects only them.
+- Laggy avatars are smoothed and shown as poorly connected (dimmed, for
+  example) rather than jumping about.
+- Avatar budgets (§7.4) stop one heavy avatar slowing everyone else.
+- Games that keep all players in lockstep, where the slowest sets the
+  pace, run as their own sessions (§5.4, §9), not in the common space.
+
+Much of this may already be done by Overte and by WebXR libraries
+(interest management, levels of detail, avatar limits). Check what they
+provide when trying them, use theirs, and add only what's missing,
+chiefly the declared requirements, which views need whatever renders
+them.
 
 ### 8.4 Personal views and changes to the space
 
