@@ -1,7 +1,7 @@
 # Cyberspace Framework: Vision
 
 Status: Vision (draft)
-Last updated: 2026-11-06
+Last updated: 2026-11-08
 
 This is the long-range picture that the child projects build toward. It
 records direction and decisions, not a schedule: features become plans in
@@ -396,6 +396,18 @@ The at3d.app draft record types for 3D identity and VRM avatars (see the
 §5.3) may cover the wardrobe; follow or help shape them rather than defining
 our own where they fit.
 
+### 7.3 Themes and ratings
+
+Leaves, hubs and assets have **themes** (hacking, anime, politics, furry,
+…): free, loose tags for finding and filtering. Separately, each has a
+**rating** from a short fixed list (`general`, `mature`, `adult`), carried
+as AT labels, because access depends on it. By default a hub lets every
+published asset from every connected leaf be used, apart from keeping
+adult content out of all-ages spaces. A hub can narrow that to keep to a
+theme, and adult spaces admit only visitors with an age attestation the
+hub accepts. Details: [hub spec](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/hub.md)
+§5.4.
+
 ## 8. Common space and presence
 
 - **Presence** (who is on which leaf, and where) is the core of the shared
@@ -407,10 +419,13 @@ our own where they fit.
 - Chat and voice: consider [Matrix](https://matrix.org) (federated rooms,
   end-to-end encrypted direct messages, voice and video via MatrixRTC)
   rather than building our own.
-- 3D and VR: Overte is the current favorite (hub spec §5.3). Its domain
+- 3D and VR: Overte, chosen 2026-11-08 (hub spec §5.3). Its domain
   servers map onto leaves or the hub's default space, and its metaverse
   server onto the hub directory, so the work is linking its accounts and
-  directory to AT identities rather than building an engine.
+  directory to AT identities rather than building an engine. A browser
+  and WebXR client, forked from Vircadia's web SDK, would join the same
+  worlds. See the
+  [Overte evaluation](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/overte_evaluation.md).
 
 Ideas for the 3D stage (direction, not yet designed):
 
