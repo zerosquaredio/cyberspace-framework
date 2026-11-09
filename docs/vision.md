@@ -192,7 +192,7 @@ direct path works, or when either user asks to stay relayed (§5.3):
 
 | Use | Mechanism | Clients |
 |---|---|---|
-| Text and voice chat | WebRTC: the hub signals, peers try a direct path through NATs, the hub relays (TURN) if that fails | Browsers and native |
+| Text and voice chat | WebRTC: the hub signals, peers try a direct path through NATs, the hub relays (TURN) if that fails. Rooms of more than a few people use a media server (SFU) at the hub instead (§8) | Browsers and native |
 | Games and other apps | An overlay network per session (as Tailscale, ZeroTier, Nebula): the hub coordinates (for example with [Headscale](https://github.com/juanfont/headscale)) and relays as a fallback. Participants see each other as if on one LAN | Native only; browsers can't join |
 
 Rules for session networks:
@@ -416,9 +416,25 @@ hub accepts. Details: [hub spec](https://github.com/zerosquaredio/nexus-lounge/b
 - Interaction depends on the leaves connected, each person's client tier,
   and the hub admin's settings. New users (with no account on any leaf) may
   be allowed in, if the hub admin chooses.
-- Chat and voice: consider [Matrix](https://matrix.org) (federated rooms,
-  end-to-end encrypted direct messages, voice and video via MatrixRTC)
-  rather than building our own.
+- **The hub works like a co-working space** (2026-11-08), at its simplest
+  with no 3D at all:
+  - **Text chat like IRC:** the hub is one big room by default, with
+    channels, and direct or group sessions people start between
+    themselves. Text goes through the hub; it's cheap.
+  - **History is ephemeral by default:** a short scrollback, then gone.
+    A channel can turn logging on, and then shows that it is logged.
+    Nothing stops participants keeping their own logs, so "not logged"
+    means the hub keeps no record, not that the chat is private.
+  - **Voice like Zoom,** again one big room by default, with smaller
+    rooms and calls. Small calls go direct between people where they can
+    (§5.4). Past about five people, everyone sending to everyone stops
+    working, so the big room uses a media server at the hub (an SFU such
+    as LiveKit, Janus or mediasoup). A big room works better if people
+    can gather into groups within it, which the views (§8.3) can show.
+  - Software: an IRCv3 server (such as Ergo), or our own over WebSocket,
+    fits the ephemeral model better than [Matrix](https://matrix.org),
+    which keeps history and copies it between servers. Matrix's design
+    is still a reference for direct messages and federation.
 - 3D and VR: Overte, chosen 2026-11-08 (hub spec §5.3). Its domain
   servers map onto leaves or the hub's default space, and its metaverse
   server onto the hub directory, so the work is linking its accounts and
@@ -463,6 +479,91 @@ their own, others pick the one they like or remix it, and a hub or leaf
 can offer its own as the default. A simple 2D map on the hub's web page
 could be the first one, once leaves publish listings and the hub
 publishes observed status.
+
+### 8.3 Views and the live model
+
+Once there is a space (anyone present, in 3D or not), the hub publishes a
+**live model** of it: who is present, groups (who is talking together, or
+standing together in 3D), links between people and things, leaves and
+their connections, and positions where there are any. A view is a
+renderer of that model. The same model can be shown as:
+
+- **ANSI:** groups of people arranged by who is talking to whom, or by
+  who is near whom in 3D. It could run as a door on any BBS, so a caller
+  on an ordinary terminal can see and talk to the hub.
+- **Detailed 2D:** icons and graphics for people, leaves and the data
+  between them (§8.2).
+- **3D in a browser** (WebXR).
+- **Overte,** and within it, simpler or more detailed renderings of the
+  same space.
+
+**Different hubs, the same views.** Hubs will want different things in
+their model (teams, scores, traffic). If each hub defined its own, a view
+would work only on the hubs it was written for. So, as glTF, IRCv3 and AT
+lexicons do:
+
+- **A small core model that every hub publishes,** defined by the
+  framework and versioned (record types such as
+  `nexus.cyberspace.space.*`): entities (people, leaves, rooms), presence,
+  groups, links, and optional positions. Every view renders the core, so
+  any view works on any hub, at least at a basic level.
+- **Everything else is a named extension** (`org.somehub.teams`), and
+  every extension object falls back to a core type: a team is a group, a
+  server rack is a leaf, a quest marker is an entity with a label and
+  icon. A view that doesn't know an extension still draws something
+  sensible. Unknown fields are ignored, never an error.
+- **A manifest:** the hub lists its core version and extensions; a view
+  lists the extensions it uses and the ones it requires. Clients show
+  each view as working fully, working without something ("no team
+  colors on this hub"), or not fitting. Most views should need nothing
+  beyond the core.
+- **The model says what is there, not how it looks.** Layout, color and
+  style belong to views. A hub that wants a say publishes optional hints
+  ("team A is red") that views may follow or ignore.
+- **Extensions that catch on become core.** Extensions are published as
+  lexicons, which AT can resolve, so anyone can look one up. Within a
+  major version the core only grows, so existing views keep working.
+
+Mismatches then cost detail, not breakage.
+
+### 8.4 Personal views and changes to the space
+
+Views can carry their own assets and models, and code: to recolor
+people, give them assigned models instead of their own (their own are the
+default), change the environment, or analyze what's happening, such as
+traffic patterns. Two kinds, with different permissions:
+
+- **Personal:** changes only what you see (simpler models, your own
+  colors, an overlay). Needs no one's permission, since no one else is
+  affected.
+- **Shared:** changes what everyone sees (team colors, the environment).
+  Needs the permission of the space's owner, the hub or leaf admin, as
+  for building (§8.1).
+
+Overte appears to make the same split (client scripts and entity
+scripts; to be confirmed).
+
+Rules for view code:
+
+- Sandboxed, reading only what the viewer could already see; no network
+  access beyond what it declares; published as an asset under its
+  author's identity, with a rating like any asset (§7.3).
+- **Who talks to whom is sensitive.** Traffic and grouping views follow
+  the presence rule (§8): opt-in, shown only to people who could see that
+  presence anyway, and aggregated where possible.
+
+### 8.5 Agents
+
+Agents could change the environment or models on someone's behalf.
+
+- An agent acts **as its user**, on the user's own model account, or on
+  a free model; the hub doesn't pay for it.
+- It has only the permissions given for its task, and what it does is
+  marked as done by an agent. Shared changes need the user's
+  confirmation.
+- **Prompt injection is the main risk:** an agent reading the chat or the
+  space can be steered by whatever others put there. So no agent holds
+  more power than its one task needs.
 
 ## 9. Games
 
