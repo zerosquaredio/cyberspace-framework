@@ -132,6 +132,7 @@ This document mixes decisions with ideas. As of 2026-11-08:
 | Blocking and moderation (§8.7) | Direction |
 | Signing in once, by hub ticket (§6.5) | Direction; wanted with stage 4, not needed for BBSes in a browser |
 | Avatar budgets, building in the space, the visible network, personal views, agents (§7.4, §8.1, §8.2, §8.4, §8.5) | Ideas |
+| Objects, styles and shared work: backends, authority, restyling, trust groups, shared media, contributor awards (§8.8) | Ideas |
 | Hub federation (§10) | Idea |
 
 ### 3.2 What comes next, and what is parked
@@ -175,6 +176,8 @@ planned until the stages above exist:
   (§9.3);
 - hub federation (§10) and multi-homed leaves;
 - agents (§8.5) and building in the space (§8.1);
+- objects with their own backends and rules, style sheets and
+  restyling, trust groups, shared media, and contributor awards (§8.8);
 - a browser and WebXR client for Overte worlds;
 - paid, ID and age verification (so adult spaces wait too; adult leaves
   can still be listed, by rating);
@@ -569,7 +572,9 @@ our own where they fit.
 Leaves, hubs and assets have **themes** (hacking, anime, politics, furry,
 …): free, loose tags for finding and filtering. Separately, each has a
 **rating** from a short fixed list (`general`, `mature`, `adult`), carried
-as AT labels, because access depends on it. By default a hub lets every
+as AT labels, because access depends on it. A leaf's theme can also
+be a style sheet that restyles its area of the space (§8.8). By default
+a hub lets every
 published asset from every connected leaf be used, apart from keeping
 adult content out of all-ages spaces. A hub can narrow that to keep to a
 theme, and adult spaces admit only visitors with an age attestation the
@@ -651,7 +656,8 @@ objects and in clients, which is a starting point (to be confirmed when
 trying it). Scripts and the assets they drive would be ordinary assets
 (§7), stored where their author chooses and shareable like any other.
 Code from other people runs sandboxed, with permissions the space's owner
-(hub or leaf admin) sets.
+(hub or leaf admin) sets. Where an object's code runs, and who pays for
+it, is in §8.8.
 
 ### 8.2 The network made visible
 
@@ -935,6 +941,297 @@ match what it has agreed. Three common starting points:
   whether to honor the other's (as between peered BBSes, Nexus Lounge
   networking spec §6).
 
+### 8.8 Objects, styles and shared work
+
+*Discussed 2026-11-10; ideas, not yet designed.* One principle runs
+through all of it: **the hub coordinates and relays; heavy work runs
+with whoever wants it, by consent.** The hub stays small and cheap, and
+the people and leaves who want something expensive supply the computing
+or bandwidth for it.
+
+#### Objects: an interface and a backend
+
+An object in the space has two halves:
+
+- **The interface:** what appears in the world. A model, a small amount
+  of state, a display, and the actions people can take on it.
+- **The backend:** where its work runs. It sends state updates to the
+  interface and receives actions.
+
+This is the door-game pattern again: the door runs on the BBS and the
+terminal only displays it; here the object is the terminal. A light
+object (a chessboard) can keep both halves together. A heavy one (a
+miner, a simulation, an AI agent, §8.5) has only its interface in the
+world.
+
+| Backend | How it connects | Who pays |
+|---|---|---|
+| Inside the hub (light objects only) | Sandboxed code with a strict CPU budget | Hub |
+| The leaf it came from | Through the leaf's tunnel | Leaf |
+| The owner's own computer | Their client, or a small companion program | Owner |
+| Anywhere else (a cloud server, a home lab) | An endpoint the hub connects to | Owner |
+
+To the hub, the last three are the same: a remote backend whose updates
+it relays through the live model (§8.3), with a bandwidth and update-rate
+limit per object. If the backend goes offline, the interface stays,
+showing that it's offline.
+
+**The hub meters what it runs rather than trusting declarations.**
+Objects declare their needs ("light, runs anywhere" or "needs a remote
+backend"), but code inside the hub is WebAssembly with an instruction
+budget ("fuel"). An object over budget is paused and marked as needing a
+remote backend. This matters for the hub's own survival: most VPS
+providers ban crypto mining, so a hub that *runs* a miner risks its
+server, while one that only *relays* a miner's display doesn't.
+
+#### Who decides: authority
+
+Whoever runs an object's rules is its **authority**: their copy decides
+what counts. Each model suits different objects:
+
+| Authority | How | Suits |
+|---|---|---|
+| **The hub** (default for public objects) | The hub runs the rules, sandboxed | Public spaces, strangers |
+| **The leaf it came from** | Actions go to the leaf through its tunnel | A leaf's own objects; the leaf pays |
+| **The person handling it** | Their device runs it; ownership passes to whoever picks it up | Physics, casual play |
+| **Everyone checks** | Every device runs the same deterministic rules and rejects an invalid action; the hub only orders and relays actions | Turn-based games with no hidden information, such as chess |
+
+For this to work, an object's rules ship as **portable code**: a
+WebAssembly module with a small fixed interface (state and action in,
+new state or refusal out), deterministic (no clock, no randomness of its
+own, no network), so the same file runs on the hub, a leaf, or a
+browser. An object declares which authorities it accepts and what it
+needs ("turn-based" or "needs fast response"); the hub admin says which
+it allows (for example "no foreign code in the hub"). The hub keeps the
+latest state, so if the authority leaves, the object moves to another or
+pauses rather than being lost. Moves can also be signed and kept as a
+record, so a chess game can be replayed and checked by anyone.
+
+Precedent: Overte's client and server entity scripts, and its
+*simulation ownership* for physics; Croquet (now Multisynq), where every
+client runs the same code and a relay only orders events; Mozilla Hubs
+passing ownership of objects.
+
+Cheating isn't a priority now; these models are chosen for cost and
+fit, and the "everyone checks" model resists cheating anyway.
+
+#### Visitors' devices
+
+Code that runs on *other people's* devices (in the "everyone checks"
+model, or a view's code, §8.4) gets a tight budget: drawing, animation,
+checking rules. Anything heavier is refused. Running heavy work on
+visitors' machines without asking is cryptojacking. Heavy work on a
+person's own machine needs their explicit consent, like the camera
+permission: "This object wants to use your processor: allow while I'm
+here / always / never". By default only the object's owner is ever asked.
+
+#### Styles: restyling the space
+
+Each leaf, and the hub, can publish a **style sheet**, like CSS for the
+space: a palette, materials, shaders, lighting, post-processing, and
+which heavier transforms it wants. Together with the leaf's default
+environment, it gives a leaf's area its theme (cyberpunk, anime, furry,
+§7.3). Leaves bring their environments and assets to the hub, where
+everyone can use them (subject to licences, below).
+
+Restyling happens in three tiers, by cost:
+
+| Tier | Examples | Where it runs | Cost |
+|---|---|---|---|
+| **1. Live** | Recolouring to a palette, cel shading, outlines, pixelation, fog, lighting, fur shaders | Each visitor's device, while drawing | Almost none; the hub sends the original plus the style sheet |
+| **2. Made once, cached** | Turning a model into blocks, a lo-fi version, reshaping (big eyes), AI restyling | A backend: the leaf wanting the style, the owner, a trust group (below), or the hub if its admin allows | Once per asset and style; the result is stored under the source's hash plus the style's hash, so every hub and visitor reuses it |
+| **3. Remixed by hand** | An artist remakes a model in their leaf's style | The artist | A new asset, linked to its original |
+
+So "the hub filters assets" mostly means the *client* filters them, at
+no cost to the hub; only tier 2 needs computing, and only once. A leaf
+can make its styled versions of everyone's assets on its own hardware and
+offer them back.
+
+Styles **cascade**, as in CSS:
+
+1. The hub's base style.
+2. A leaf's area: walk into it, and its style applies to everything
+   there, visitors' objects included (Overte's zone entities already set
+   lighting, haze and sky per zone).
+3. The object's own rules: parts marked "don't restyle", such as a logo,
+   a sign's text, or a chess piece that must stay recognisable.
+4. The viewer's own preferences, last: no pixelation, high contrast, no
+   flashing. These are accessibility overrides, like a user style sheet.
+
+**Avatars are restyled only by consent**: "adapt my avatar to the local
+style: yes / colours only / no". An avatar is someone's identity.
+
+A style sheet is a named extension with a fallback (§8.3): a client that
+can't run shaders applies only the palette, or shows the original. The
+format can build on glTF (with material variants) plus a small style
+document of our own, published by the leaf as an AT record, like its
+listing.
+
+#### Licences and credit
+
+- Copying or modifying another leaf's asset makes a derivative work, so
+  assets carry licence information (CC-BY, CC-BY-NC, no derivatives,
+  this hub only), and hubs respect it.
+- Tier 1 restyling is display, like a browser's dark mode, and is
+  probably fine for any asset. Tier 2 makes a new copy, so "no
+  derivatives" rules it out. Tier 3 needs the licence to allow it.
+- Every derived asset links to its source (an AT record reference): who
+  made the original, and which style made this version. Credit follows
+  automatically, and a leaf leaving a hub can take back its originals.
+- A restyled asset keeps at least its source's rating (§7.3).
+
+#### Trust groups: sharing computation
+
+People can pool their computers for shared work: a dozen people running
+one miner object together, a leaf's members making its tier-2 styled
+assets, rendering, simulations, volunteer science. A trust group answers
+one question: **may this code use my resources?** The sandbox applies to
+everyone whatever the trust, so the group isn't about safety; and some
+work checks itself (a mining share, a chess move), or can be checked by
+giving the same piece to two members, as BOINC does.
+
+- **The group is an AT record** published by its creator (members,
+  coordinator, code). **Each member publishes their own acceptance
+  record**; membership counts only when both agree, as with a listing
+  linked to a hub.
+- **Consent is to specific code:** its content hash, signed by its
+  author's DID. A new version needs new consent, unless the member chose
+  "accept updates from this author". So nobody can swap in other code.
+- **Each member sets limits:** processor and GPU share, only when idle or
+  plugged in (off by default on phones and headsets), hours, an expiry,
+  and **no network access except to the group's coordinator**. Their own
+  device enforces them; the records only express consent. Leaving is
+  instant.
+- **Trust doesn't pass along:** being in a group with someone doesn't
+  mean trusting their other groups.
+- **The coordinator** is the object's backend (above): it splits the
+  work, hands out pieces, collects results and credits contributors. The
+  object in the world shows the group: total work, who is contributing,
+  and a join button that opens the consent prompt. Mining pools, BOINC
+  and Folding@home are the precedent.
+- **The risk is a botnet, not dishonest results.** Group code with free
+  network access could attack other sites. Hence no network beyond the
+  coordinator, through the hub; and the hub sees group traffic and sets
+  its rules ("no compute groups", "no mining", bandwidth caps).
+- **It needs our own client.** A browser can share work only while its
+  tab is open (Web Workers, WebGPU); background work, GPU limits and
+  enforcing consent properly need our client, or a companion program
+  beside the browser.
+
+(Bitcoin itself is a poor example in practice: specialised mining chips
+have made CPU and GPU mining unprofitable. The pattern is what matters.)
+
+#### Shared media: a film for the room
+
+Someone wants to play a film for everyone. Four ways, cheapest first:
+
+| Way | How | Hub bandwidth | For |
+|---|---|---|---|
+| **1. Everyone fetches, the hub keeps time** (default) | The hub sends a small playback state: which video, started at hub time T, playing or paused. Each client streams it from the source and follows the shared clock | Almost none | Anything everyone can reach: public videos, a leaf's own files, services each viewer has access to |
+| **2. The hub relays** | One upload; the hub's SFU forwards it | Viewers × bitrate (30 × 5 Mbps = 150 Mbps) | Live screen sharing; a private file only one person has |
+| **3. Viewers pass it on** | The source sends it once; viewers share pieces with each other (WebTorrent-style, as PeerTube does) | About one copy | Big rooms, scheduled showings |
+| **4. Downloaded ahead** | Clients fetch the file (by hash) before a scheduled showing, then play it locally at the shared time | None at showtime | Film nights, events |
+
+- **Syncing:** each client plays at *now minus the start time*; it
+  corrects small drift by playing a few percent faster or slower, and
+  jumps if more than about half a second out. Pause, seek, and who holds
+  the remote are updates to the same small state.
+- **Selective, like voice:** people far from the screen get a lower
+  resolution, people elsewhere get nothing, and the sound comes from the
+  screen's position, positioned on each device.
+- **Passing it on (way 3) is shared bandwidth, opt-in** ("I'll pass it
+  on, up to 5 Mbps"). It shows viewers' addresses to each other, so it is
+  for trust groups or people who choose it; others get it from the hub or
+  the source. A hub's offer might require it, or way 4, for showings over
+  a certain size.
+- **The law matters as much as bandwidth.** A hub relaying a film (way
+  2) is distributing it, and carries the copyright risk. Viewers each
+  streaming from a source they can already reach (way 1) is a shared
+  clock, which is how watch-party services stay legal. So a hub's rules
+  might allow relaying only screen sharing and content the uploader owns.
+
+#### Appreciating contributors
+
+BBSes always recognised contributors (upload ratios, "top uploaders"
+bulletins; ENiGMA½ has achievements). The hub can too:
+
+- **What's counted:** work units completed (counted by the coordinator,
+  not the contributor); media pieces passed on (confirmed by the
+  receivers); assets contributed and restyled, and how much they're used
+  (from the credit links); a leaf's backends that others use, and their
+  uptime. This is appreciation, not payment, so light checks are enough.
+- **Friendly, not a race:** listing is opt-in, like presence, and
+  "anonymous contributor" is allowed; totals are weekly or monthly, never
+  live (a live board would show who is online); awards recognise variety
+  (first contribution, a long streak, the most-used asset, a newcomer),
+  and use levels rather than strict ranks, since raw totals mostly reward
+  whoever has the biggest GPU.
+- **Awards are AT records:** the hub's own account (hub plan H6)
+  publishes an award naming the member's DID ("Contributor of the Month,
+  November 2026"). It is signed by the hub, so it can't be forged, and
+  the member chooses whether to show it (both sides agree). Awards travel
+  with people to other hubs and leaves, and a BBS can show them beside its
+  own achievements.
+- **Leaves too:** members' contributions add up per leaf ("this leaf's
+  members made 400 styled assets this month"), giving leaves a reason to
+  encourage them.
+- **Later, perhaps:** contributions counting toward a leaf's share of
+  hub costs (§4.1, §4.2). Kept as appreciation for now: once
+  contributions are worth money, people have reasons to game them, and
+  there may be tax questions.
+
+#### How practical, and in what order
+
+*Assessed 2026-11-10.* Almost all of this builds on existing software
+and needs no research; the parts differ mainly in effort.
+
+| Part | Practical? |
+|---|---|
+| Interface and backend objects | Yes, moderate: the backend protocol, how a backend proves who it is, rate limits. Works in the 2D map and ANSI view too |
+| Hub or leaf authority; "everyone checks" for turn-based games | Yes; chess rules in WebAssembly are small and deterministic |
+| Physics with ownership hand-off | Built into Overte; hard in our own web views. Physics doesn't compute identically on different machines, so it uses ownership, never "everyone checks" |
+| Fuel metering | Yes: Wasmtime has fuel built in; elsewhere (Node, browsers) by instrumenting code when it loads, or a worker that is stopped |
+| Consent prompts | Yes; ordinary interface work |
+| Live styles (tier 1) | Yes in web views (three.js shaders); harder in Overte, where styling everything in a zone probably needs client changes |
+| Cached restyling (tier 2) | Simplifying, blocks and recolouring, yes (gltf-transform, meshoptimizer). Reshaping and AI restyling are immature, and automatic results often look poor; artists (tier 3) cover the gap |
+| Licences, credit, trust group records, awards | Yes, easy (awards need the hub's own account, hub plan H6) |
+| Coordinator and companion program | Practical (BOINC shows it), but the biggest single project, and the most security-sensitive: a native program running other people's code |
+| Shared media, ways 1, 2 and 4 | Yes, easy; LiveKit already does screen sharing |
+| Shared media, way 3 | Moderate: libraries exist (WebTorrent, p2p-media-loader), but firewalls between home connections make it patchy |
+
+The real problems:
+
+- **Two worlds means doing things twice.** Overte runs JavaScript on its
+  own engine; web views would use three.js and WebAssembly. To avoid
+  writing every object and style twice, keep **rules in WebAssembly** and
+  **looks as data** (glTF and the style sheet), with a thin adapter per
+  client. Whether Overte's scripting can run WebAssembly is untested
+  (§11).
+- **Films in a browser's 3D world.** Browsers won't draw protected video
+  (DRM services) or other sites' embeds, such as YouTube, onto a 3D
+  surface. In a web 3D view, only directly hosted video that allows it
+  can be a screen in the world; anything else becomes a floating 2D
+  panel. Overte's native client can show web pages on surfaces, so it
+  does better.
+- **Automatic restyling quality** is an artistic risk, not a technical
+  one.
+- **Effort:** all of this together is years of work for a small team, so
+  the order matters more than feasibility.
+
+Suggested order, mostly without 3D:
+
+1. A chessboard on the 2D map and in the ANSI view, using "everyone
+   checks": it proves the interface and backend split, portable
+   WebAssembly rules, and the live model, cheaply.
+2. An object with a BBS backend, such as a door game's status shown in
+   the space.
+3. Synced media (way 1) and screen sharing.
+4. Contributor awards, once the hub has its own account.
+5. In 3D: live styles in web views, then in Overte once the experiments
+   answer the WebAssembly question.
+6. Last: cached restyling, peer media sharing, trust groups and the
+   companion program.
+
 ## 9. Games
 
 The BBS world already has a precedent: door networks such as DoorParty and
@@ -1018,6 +1315,13 @@ records, and other hubs subscribe to them.
 - How the live model is carried (WebSocket stream, as the directory's
   live updates, hub spec §5.2) and how its core is versioned (§8.3).
 - How view code is sandboxed in each runtime, Overte's especially (§8.4).
+- Objects (§8.8): the WebAssembly runtime and fuel budgets for code in
+  the hub and on visitors' devices; how a remote backend connects and
+  authenticates; how authority is handed over; the style sheet format;
+  licence metadata on assets; the trust group and acceptance record
+  types; how the consent prompt works in each client.
 - Overte: whether its accounts server can be self-hosted, whether a
   relay can carry a home-based domain's traffic, and how far the old
-  web SDK has drifted (Overte evaluation §4, §5). All untested.
+  web SDK has drifted (Overte evaluation §4, §5); and whether its
+  scripting can run WebAssembly, for portable object rules (§8.8). All
+  untested.
