@@ -6,9 +6,9 @@ Last updated: 2026-11-08
 This is the long-range picture that the child projects build toward. It
 records direction and decisions, not a schedule: features become plans in
 the children (for Nexus Lounge, its
-[development plan](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/development_plan.md)
+[development plan](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/development/development_plan.md)
 and
-[hub development plan](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/hub_development_plan.md))
+[hub development plan](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/development/hub_development_plan.md))
 only when they are near.
 
 Links below to `nexus-lounge` specs point at its `master` branch.
@@ -44,7 +44,7 @@ layer must be software we fully control and can fork (hub spec §5.3).
 | Term | Meaning |
 |---|---|
 | **Leaf** | Any endpoint people connect to through a hub: a BBS today; later chats, games, VR worlds, other services. Run by its own admin (for a BBS, the sysop) |
-| **Hub** | A public server that leaves register with. It is a login point and directory for users, can relay traffic to leaves through tunnels, and can host a common space ([hub spec](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/hub.md)) |
+| **Hub** | A public server that leaves register with. It is a login point and directory for users, can relay traffic to leaves through tunnels, and can host a common space ([hub spec](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/development/hub.md)) |
 | **Common space** | Where people on a hub meet, whatever leaf they are using: text, voice, avatars, and later 3D environments |
 | **Client tier** | What a person's client can do: web page, desktop app, VR headset. Everyone takes part at the level their client supports |
 
@@ -66,7 +66,7 @@ following the network. That decides what goes in them:
 Bluesky made the same split: its DMs are a separate chat service, not AT
 records. Users can still call hub services as themselves without a separate
 login, through their PDS's service proxying
-([hub spec](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/hub.md)
+([hub spec](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/development/hub.md)
 §5.2).
 
 ### 2.2 Record type names
@@ -90,7 +90,7 @@ are grouped by **whose repo the record lives in**:
   when the first schemas are published (Nexus Lounge F9), not before.
 - New groups can be added later without affecting existing names.
 - Names and fields are permanent once published; drafts and the change rules
-  are in the [publishing spec](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/publishing.md) §3.
+  are in the [publishing spec](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/development/publishing.md) §3.
 - Schemas will live in this repo's `lexicons/` directory, under CC0.
 - The reference hub uses `hub.cyberspace.nexus`; other hubs use their own
   domains.
@@ -315,7 +315,7 @@ separate from the networking.
 
 | Class | Examples | Relaying |
 |---|---|---|
-| Terminal and web | SSH, telnet, WebSocket terminals, web pages | Cheap. The planned tunnel. SSH stays end-to-end encrypted; telnet and plain web are readable by the hub ([hub spec](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/hub.md) §7) |
+| Terminal and web | SSH, telnet, WebSocket terminals, web pages | Cheap. The planned tunnel. SSH stays end-to-end encrypted; telnet and plain web are readable by the hub ([hub spec](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/development/hub.md) §7) |
 | Assets | Avatars, icons, ANSI art, environments, game downloads | Affordable with caching: assets addressed by content hash (CID) never change, so the hub fetches each once and serves it to everyone |
 | Real-time | Voice, VR positions and world state | Expensive, and needs a UDP-capable relay (TURN, QUIC, or WebTransport), because TCP tunnels add stutter. Optional per hub and per leaf |
 | Between users | Chat, voice, game sessions (§5.4) | Small for chat, voice (around 50 kbit/s per person), and classic games; relayed only when direct fails |
@@ -327,7 +327,7 @@ Same-machine leaves need no tunnel: the hub proxies to a local socket.
 ### 6.1 Decision: every leaf has its own DID
 
 *Decided 2026-11-06; first built 2026-11-08 (Nexus Lounge F9).* This confirms the BBS account in Nexus Lounge's
-[publishing spec](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/publishing.md)
+[publishing spec](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/development/publishing.md)
 §2 and extends it to every kind of leaf.
 
 **A leaf is an AT account with its own `did:plc` DID, separate from its
@@ -563,7 +563,7 @@ Resolution order on a leaf:
 The hub uses the same order, starting from the user's hub choice.
 
 The at3d.app draft record types for 3D identity and VRM avatars (see the
-[hub spec](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/hub.md)
+[hub spec](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/development/hub.md)
 §5.3) may cover the wardrobe; follow or help shape them rather than defining
 our own where they fit.
 
@@ -578,7 +578,7 @@ a hub lets every
 published asset from every connected leaf be used, apart from keeping
 adult content out of all-ages spaces. A hub can narrow that to keep to a
 theme, and adult spaces admit only visitors with an age attestation the
-hub accepts. Details: [hub spec](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/hub.md)
+hub accepts. Details: [hub spec](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/development/hub.md)
 §5.4.
 
 ### 7.4 Avatar budgets
@@ -643,7 +643,7 @@ rating, and its lower levels of detail (§8.3) can serve as the fallback.
   directory to AT identities rather than building an engine. A browser
   and WebXR client, forked from Vircadia's web SDK, would join the same
   worlds. See the
-  [Overte evaluation](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/overte_evaluation.md).
+  [Overte evaluation](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/development/overte_evaluation.md).
 
 Ideas for the 3D stage (direction, not yet designed):
 
