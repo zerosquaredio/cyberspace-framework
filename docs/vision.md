@@ -1,7 +1,7 @@
 # Cyberspace Framework: Vision
 
 Status: Vision (draft)
-Last updated: 2026-11-08
+Last updated: 2026-11-25
 
 This is the long-range picture that the child projects build toward. It
 records direction and decisions, not a schedule: features become plans in
@@ -134,6 +134,7 @@ This document mixes decisions with ideas. As of 2026-11-08:
 | Avatar budgets, building in the space, the visible network, personal views, agents (§7.4, §8.1, §8.2, §8.4, §8.5) | Ideas |
 | Objects, styles and shared work: backends, authority, restyling, trust groups, shared media, contributor awards (§8.8) | Ideas |
 | Hub federation (§10) | Idea |
+| One world at every level: levels, kinds of asset, ANSI art, roles and themes, the baker, cohesion, shared reality, the MUD view ([world.md](world.md)) | Ideas |
 
 ### 3.2 What comes next, and what is parked
 
@@ -518,6 +519,10 @@ all three.
 
 ## 7. Assets and avatars
 
+How assets scale from text to full VR, where they come from, the baker
+that derives each level's version, and keeping a space cohesive are in
+[One World at Every Level](world.md) §6 to §8.
+
 ### 7.1 Where assets live
 
 | Asset | Where |
@@ -618,7 +623,11 @@ rating, and its lower levels of detail (§8.3) can serve as the fallback.
   with no 3D at all:
   - **Text chat like IRC:** the hub is one big room by default, with
     channels, and direct or group sessions people start between
-    themselves. Text goes through the hub; it's cheap.
+    themselves. Text goes through the hub; it's cheap. *Revised
+    2026-11-25:* the text level is better modelled as a MUD, which
+    contains IRC's channels and adds places, `say` within a place,
+    descriptions and building; IRC stays the transport for now
+    ([One World at Every Level](world.md) §4).
   - **History is ephemeral by default:** a short scrollback, then gone.
     A channel can turn logging on, and then shows that it is logged.
     Nothing stops participants keeping their own logs, so "not logged"
@@ -650,7 +659,8 @@ Ideas for the 3D stage (direction, not yet designed):
 ### 8.1 Building in the space
 
 The space should have a built-in way to create and program things from
-inside it: make an object, write the code that makes it behave, and share
+inside it, as MOOs and MUSHes did in text, carried to every level up to
+full VR ([One World at Every Level](world.md) §1, §5): make an object, write the code that makes it behave, and share
 it, without leaving the space. Overte already runs JavaScript scripts on
 objects and in clients, which is a starting point (to be confirmed when
 trying it). Scripts and the assets they drive would be ordinary assets
@@ -1309,7 +1319,10 @@ records, and other hubs subscribe to them.
 - Federation model for common spaces (§10).
 - How handoff tickets are issued and checked (§5.3), and the format of
   leaf-vouched statements (§6.4); possibly the same mechanism.
-- Chat software: an IRCv3 server, or our own over WebSocket (§8).
+- Chat software: an IRCv3 server, or our own over WebSocket (§8). The
+  hub runs an IRC server today; the MUD model (world.md §4) can keep it as
+  the transport.
+- The open questions of [One World at Every Level](world.md) §10.
 - Moderation: the exact powers in each model, how a leaf's block is
   passed to the hub, and how reviews work (§8.7).
 - How the live model is carried (WebSocket stream, as the directory's

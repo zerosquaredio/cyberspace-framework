@@ -6,7 +6,8 @@ while you use BBSes, chats, games, and VR worlds. Identity comes from the
 [AT Protocol](https://atproto.com) (Bluesky accounts and others).
 
 It is built in stages, starting with text terminals. The long-range design
-is in [docs/vision.md](docs/vision.md).
+is in [docs/vision.md](docs/vision.md); how one shared world works at every
+level, from text to VR, is in [docs/world.md](docs/world.md).
 
 ## Projects
 
