@@ -379,6 +379,13 @@ Rules that keep shared reality intact:
   entrance is "a stone archway glowing with runes" in fantasy and "a server
   rack, humming, its door lit green" in cyberpunk.
 
+**On web pages, a theme is a view:** colours, fonts and how art is drawn,
+published as an asset by a leaf or the hub and chosen from a menu, across
+every page of the hub. Views are data the hub turns into styles, never a
+leaf's own CSS, and their text must stay readable
+([assets spec](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/development/assets.md)
+§3.6). The hub's first ones are its own (hub plan H20).
+
 Decoration is the long tail; steps 3 and 4 handle it harmlessly. Themes are
 assets like any other: made, shared and remixed, with credit through their
 source links. AI-made themed versions of whole objects (the vision's cached
