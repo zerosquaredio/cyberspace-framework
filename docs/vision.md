@@ -824,6 +824,11 @@ Agents could change the environment or models on someone's behalf.
 - **Prompt injection is the main risk:** an agent reading the chat or the
   space can be steered by whatever others put there. So no agent holds
   more power than its one task needs.
+- *Designed further 2026-11-25* in the
+  [resource node spec](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/development/resource_node.md) §7: agents run on
+  their owner's node, work in private workspaces, deliver through drives,
+  and hear only the people their rules allow, filtered in code before the
+  model sees anything.
 
 ### 8.6 Where presence comes from
 
@@ -978,7 +983,7 @@ world.
 |---|---|---|
 | Inside the hub (light objects only) | Sandboxed code with a strict CPU budget | Hub |
 | The leaf it came from | Through the leaf's tunnel | Leaf |
-| The owner's own computer | Their client, or a small companion program | Owner |
+| The owner's own computer | Their client, or a small companion program (a [resource node](https://github.com/zerosquaredio/nexus-lounge/blob/master/docs/development/resource_node.md)) | Owner |
 | Anywhere else (a cloud server, a home lab) | An endpoint the hub connects to | Owner |
 
 To the hub, the last three are the same: a remote backend whose updates
