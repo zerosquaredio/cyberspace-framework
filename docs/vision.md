@@ -166,6 +166,13 @@ chat, one from a browser and one from inside a BBS terminal.
 3D with Overte (stage 4), and with it tickets for signing in once
 (§6.5), which the 3D clients and non-BBS leaves are the first to need.
 
+*Revised 2026-11-25.* Assets came first, starting with ANSI art, and the
+order from here is that of [One World at Every Level](world.md) §9: art
+and emblems on the map; places and a MUD view; building in text and on the
+map; the baker; a Doom-style view; then the 3D levels and VR. Voice is
+still wanted and has no place in that order yet. Whether 3D is Overte
+worlds or our own web views is open (world.md §10).
+
 **Any time:** the Overte experiments (run a domain, try the client, test
 the three untested assumptions, §11). They are cheap, and they decide
 whether stage 4 is practical as designed.
@@ -176,7 +183,8 @@ planned until the stages above exist:
 - overlay networks for game sessions (§5.4), and native game downloads
   (§9.3);
 - hub federation (§10) and multi-homed leaves;
-- agents (§8.5) and building in the space (§8.1);
+- agents (§8.5) and building in the space (§8.1); both have designs now
+  (the resource node spec, and world.md §5), and no dates;
 - objects with their own backends and rules, style sheets and
   restyling, trust groups, shared media, and contributor awards (§8.8);
 - a browser and WebXR client for Overte worlds;
