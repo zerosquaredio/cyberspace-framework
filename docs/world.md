@@ -1,7 +1,7 @@
 # Cyberspace Framework: One World at Every Level
 
 Status: Ideas (discussed 2026-11-25)
-Last updated: 2026-11-25
+Last updated: 2026-11-27
 
 How one shared world can be seen, used, changed and programmed by everyone
 in it, whatever their client: a text terminal, a 2D map in a browser, 3D in
@@ -47,6 +47,26 @@ The world needs a shape every level can show:
   (beside whoever they are talking to, or at the place's entrance), and they
   can move to named spots.
 
+**Zones** (*added 2026-11-27*). The common space need not be one big
+room: it can be divided into zones, each a space of its own that people
+enter and leave, as a MUD's rooms or a game's zones. A zone is separate
+in computation too: its objects, events and movement stay inside it, and
+only hub-wide chat, announcements, global events and presence cross
+between zones. A zone's definition (plan, objects, rules, assets) is
+records and assets like anything else, so:
+
+- **a person can keep a whole room on their own headless leaf** and open
+  it on the hub for everyone, the hub running it or forwarding to the
+  leaf; visitors still connect only through the hub;
+- **the hub's admin can give a zone,** or part of the common space, to a
+  person or a group to run, under the hub's rules, which always come
+  first;
+- **zones are copied and remixed** like any asset, each part under its
+  own permissions.
+
+How zones are placed, owned and limited is in the compute spec
+(nexus-lounge `docs/development/compute.md` §4.4).
+
 ### 2.2 Levels
 
 Levels differ in two ways: the **shape** of what's drawn (text, flat or 3D)
@@ -78,6 +98,19 @@ frame rate falls.
 
 The Doom-style preset runs on almost anything and suits the grid style
 (§8), so it may be the best first 3D view.
+
+**The technical view** (*added 2026-11-27*) is a preset for seeing how
+things work rather than how they look: every object as a simple shape,
+the environment transparent or in wireframe, and the **links** drawn as
+lines: an object to the sites it fetches from, objects calling each
+other, feeds to the zones and objects that follow them, events from an
+object to the zone that takes them, and (for the person concerned)
+people to the objects and agents they use. Picking anything shows its
+record, its program's manifest and source, and its assets (compute spec
+§2.6), so anyone can judge whether to trust it and help debug it. It is
+drawn from the same facts as every other view (§3); it only shows more of
+them. Lines to a person are shown to that person alone unless they make
+them public.
 
 ### 2.3 Choosing a version
 
